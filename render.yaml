@@ -7,5 +7,11 @@ services:
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
       - key: NODE_ENV
         value: production

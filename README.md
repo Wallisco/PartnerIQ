@@ -26,18 +26,54 @@ git remote add origin https://github.com/YOUR_USERNAME/partneriq.git
 git push -u origin main
 ```
 
-### 2. Create a Render Web Service
+### 2. Create a Render PostgreSQL database
+
+1. In Render dashboard → **New → PostgreSQL**
+2. Name it `partneriq-db`, choose the free tier
+3. Once created, copy the **Internal Database URL** (you'll need it in step 4)
+
+This is what fixes the data-loss issue — group and member data now persists in a real database instead of a file that gets wiped on every redeploy.
+
+### 3. Create a Render Web Service
 
 1. Go to [render.com](https://render.com) and sign in
 2. Click **New → Web Service**
 3. Connect your GitHub repo (`partneriq`)
 4. Render will auto-detect the `render.yaml` config
-5. Set the environment variable:
-   - Key: `ANTHROPIC_API_KEY`
-   - Value: your key from [console.anthropic.com](https://console.anthropic.com)
-6. Click **Deploy**
 
-Your app will be live at `https://partneriq.onrender.com` (or your custom name).
+### 4. Set environment variables
+
+In the web service's **Environment** tab, add:
+
+| Key | Value |
+|-----|-------|
+| `ANTHROPIC_API_KEY` | your key from console.anthropic.com |
+| `DATABASE_URL` | the Internal Database URL from step 2 |
+| `RESEND_API_KEY` | your key from resend.com (optional, see below) |
+| `FROM_EMAIL` | e.g. `PartnerIQ <onboarding@resend.dev>` (optional) |
+
+### 5. Set up email delivery (optional but recommended)
+
+Without this, codes are only ever shown once on screen and there is no recovery.
+
+1. Sign up free at [resend.com](https://resend.com)
+2. Create an API key, add it as `RESEND_API_KEY`
+3. Resend's default `onboarding@resend.dev` sender works immediately for testing; for production, verify your own domain in Resend and set `FROM_EMAIL` accordingly
+
+### 6. Deploy
+
+Click **Deploy**. Your app will be live at `https://partneriq-9brl.onrender.com` (or your custom name).
+
+---
+
+## What changed: persistence and recovery
+
+Previously, group data was stored in a JSON file on local disk. Render's web services use **ephemeral storage** — every redeploy wipes local files, which silently destroyed all group data including results codes. This has been fixed:
+
+- All group and member data now lives in **PostgreSQL**, which survives redeploys
+- Organisers can optionally provide an email at group creation; codes are emailed automatically via Resend
+- A **recovery flow** (`/api/recover`) lets an organiser request their codes be resent by entering the email they used — no codes are ever displayed to someone who doesn't already know the associated email
+
 
 ### 3. Custom domain (optional)
 
