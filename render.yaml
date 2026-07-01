@@ -13,5 +13,7 @@ services:
         sync: false
       - key: FROM_EMAIL
         sync: false
+      - key: APP_URL
+        value: https://partneriq.fit
       - key: NODE_ENV
         value: production
