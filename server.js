@@ -52,8 +52,9 @@ async function initDb() {
       expires TIMESTAMPTZ NOT NULL
     );
   `);
-  // Add context column to existing tables if not present (safe migration)
+  // Safe migrations — add columns to existing tables if not present
   await pool.query(`ALTER TABLE groups ADD COLUMN IF NOT EXISTS context JSONB DEFAULT '{}'`);
+  await pool.query(`ALTER TABLE members ADD COLUMN IF NOT EXISTS email TEXT`);
   console.log('Database tables ready');
 }
 
