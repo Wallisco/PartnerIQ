@@ -185,6 +185,8 @@
         <input type="text" id="group-name" placeholder="e.g. The Falcon Collective">
         <label>Your name</label>
         <input type="text" id="organiser-name" placeholder="Your full name">
+        <label>Your email (we'll send your codes here)</label>
+        <input type="email" id="organiser-email" placeholder="you@example.com">
         <button class="btn btn-navy btn-full" id="btn-create" onclick="createGroup()">Create group →</button>
         <div id="create-result" style="display:none;margin-top:1.25rem">
           <div class="divider"></div>
@@ -199,6 +201,7 @@
             <div class="code-value" id="disp-results-code" style="font-size:16px;word-break:break-all">—</div>
           </div>
           <p class="muted" style="margin-top:.75rem;font-size:12px">Once your partners have submitted, go to "View report" and enter your results code to unlock the full partnership analysis.</p>
+          <p class="muted" id="email-confirm-note" style="margin-top:.5rem;font-size:12px;font-weight:500"></p>
         </div>
       </div>
     </div>
@@ -211,6 +214,16 @@
         <input type="text" id="results-code-input" placeholder="e.g. KEY-FALCON-422-AB3XY" oninput="this.value=this.value.toUpperCase()">
         <div class="error" id="results-error"></div>
         <button class="btn btn-gold btn-full" onclick="viewResults()">Unlock full report →</button>
+        <p class="muted" style="margin-top:1rem;text-align:center">
+          Lost your code? <a href="#" onclick="showRecovery();return false" style="color:var(--navy);font-weight:500">Recover it by email</a>
+        </p>
+        <div id="recovery-form" style="display:none;margin-top:1rem">
+          <div class="divider"></div>
+          <label>Email used when you created the group</label>
+          <input type="email" id="recovery-email" placeholder="you@example.com">
+          <button class="btn btn-full" onclick="recoverCode()">Send my codes →</button>
+          <p class="muted" id="recovery-message" style="margin-top:0.75rem;text-align:center"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -297,6 +310,7 @@
       <div class="tab" onclick="switchResultsTab('profiles')">Profiles</div>
       <div class="tab" onclick="switchResultsTab('matrix')">Compatibility</div>
       <div class="tab" onclick="switchResultsTab('dynamics')">Team dynamics</div>
+      <div class="tab" onclick="switchResultsTab('nexthire')">Next hire</div>
     </div>
 
     <div id="results-summary">
@@ -312,6 +326,14 @@
     <div id="results-matrix" style="display:none"><div id="matrix-content"></div></div>
     <div id="results-dynamics" style="display:none">
       <div class="card" id="dynamics-ai"><span class="spinner"></span> Analysing team dynamics…</div>
+    </div>
+    <div id="results-nexthire" style="display:none">
+      <div class="card" id="domain-coverage-wrap">
+        <div class="section-label" style="margin-top:0">Team strength domain coverage</div>
+        <p class="muted" style="margin-bottom:1rem">Based on CliftonStrengths' four domains, mapped from your team's OCEAN profiles.</p>
+        <div id="domain-bars"></div>
+      </div>
+      <div class="card" id="nexthire-ai"><span class="spinner"></span> Identifying your highest-leverage next hire…</div>
     </div>
   </div>
 </div>
@@ -358,6 +380,39 @@ const AVATAR_COLORS=[
 ];
 const CHART_COLORS=['#1D9E75','#185FA5','#7F77DD','#D85A30','#B8780A','#D4537E'];
 
+// CliftonStrengths-style domain mapping derived from OCEAN traits.
+// Executing = Conscientiousness-led (gets things done, reliable, structured)
+// Influencing = Extraversion-led (persuades, leads, sells, drives momentum)
+// Relationship Building = Agreeableness-led (connects, trusts, unites people)
+// Strategic Thinking = Openness-led (analyses, ideates, plans ahead)
+// Emotional Stability acts as a cross-cutting resilience modifier on all four.
+const DOMAINS = {
+  executing: { label: 'Executing', desc: 'Gets things done — discipline, follow-through, reliable delivery.', primary: 'C' },
+  influencing: { label: 'Influencing', desc: 'Drives momentum — persuasion, leadership, external energy.', primary: 'E' },
+  relationship: { label: 'Relationship Building', desc: 'Holds the team together — trust, empathy, cohesion.', primary: 'A' },
+  strategic: { label: 'Strategic Thinking', desc: 'Sees ahead — analysis, ideation, pattern-spotting.', primary: 'O' }
+};
+const DOMAIN_COLORS = { executing: '#185FA5', influencing: '#7F77DD', relationship: '#D85A30', strategic: '#1D9E75' };
+
+function domainScore(member, domainKey) {
+  const primary = DOMAINS[domainKey].primary;
+  const stabilityModifier = (member.traits.N - 50) * 0.15; // resilience nudges all domains slightly
+  return Math.max(0, Math.min(100, Math.round(member.traits[primary] + stabilityModifier)));
+}
+
+function teamDomainCoverage(members) {
+  const coverage = {};
+  Object.keys(DOMAINS).forEach(d => {
+    const scores = members.map(m => domainScore(m, d));
+    coverage[d] = {
+      avg: Math.round(scores.reduce((a,b)=>a+b,0) / scores.length),
+      max: Math.max(...scores),
+      topMember: members[scores.indexOf(Math.max(...scores))].name
+    };
+  });
+  return coverage;
+}
+
 let state={groupCode:null,participantName:null,roles:[],currentQ:0,answers:[]};
 
 function showScreen(id){
@@ -373,7 +428,7 @@ function switchHomeTab(tab){
 }
 
 function switchResultsTab(tab){
-  const tabs=['summary','profiles','matrix','dynamics'];
+  const tabs=['summary','profiles','matrix','dynamics','nexthire'];
   document.querySelectorAll('#results-tabs .tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   tabs.forEach(t=>{document.getElementById('results-'+t).style.display=t===tab?'block':'none';});
 }
@@ -381,18 +436,39 @@ function switchResultsTab(tab){
 async function createGroup(){
   const name=document.getElementById('group-name').value.trim();
   const organiser=document.getElementById('organiser-name').value.trim();
+  const organiserEmail=document.getElementById('organiser-email').value.trim();
   if(!name||!organiser){alert('Please fill in all fields.');return;}
   const btn=document.getElementById('btn-create');
   btn.disabled=true;btn.textContent='Creating…';
   try{
-    const r=await fetch('/api/groups',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,organiser})});
+    const r=await fetch('/api/groups',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,organiser,organiserEmail})});
     const d=await r.json();
     if(!r.ok)throw new Error(d.error);
     document.getElementById('disp-group-code').textContent=d.groupCode;
     document.getElementById('disp-results-code').textContent=d.resultsCode;
     document.getElementById('create-result').style.display='block';
+    const emailNote=document.getElementById('email-confirm-note');
+    if(emailNote){
+      emailNote.textContent=d.emailSent ? `Also sent to ${organiserEmail}.` : (organiserEmail ? 'Email delivery is not yet configured — save these codes now.' : 'No email provided — save these codes now, they will not be shown again.');
+    }
   }catch(e){alert('Error: '+e.message);}
   btn.disabled=false;btn.textContent='Create group →';
+}
+
+function showRecovery(){
+  document.getElementById('recovery-form').style.display='block';
+}
+
+async function recoverCode(){
+  const email=document.getElementById('recovery-email').value.trim();
+  const msg=document.getElementById('recovery-message');
+  if(!email){msg.textContent='Please enter your email.';return;}
+  msg.textContent='Sending…';
+  try{
+    const r=await fetch('/api/recover',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const d=await r.json();
+    msg.textContent=d.message||'If that email has groups on file, codes have been resent.';
+  }catch(e){msg.textContent='Something went wrong. Please try again.';}
 }
 
 async function startJoin(){
@@ -511,6 +587,7 @@ function buildResultsScreen(grp){
   buildRadarChart(grp);
   buildProfilesList(grp);
   buildCompatMatrix(grp);
+  buildNextHire(grp);
   generateAI('summary',grp);
   generateAI('dynamics',grp);
 }
@@ -621,6 +698,65 @@ async function generatePairAI(a,b,idxA,idxB){
     const result=await callAI(`Analyse business compatibility between ${a.name} (${a.archetype}, ${traitLine(a)}) and ${b.name} (${b.archetype}, ${traitLine(b)}).\n\nIn 2-3 sentences each: (1) Where they naturally complement each other, (2) Where friction will emerge, (3) One structural recommendation for this pairing. ~120 words. Be direct and specific.`);
     el.innerHTML=`<div class="ai-output">${result}</div>`;
   }catch(e){el.innerHTML=`<p class="muted">Could not generate pairing analysis.</p>`;}
+}
+
+function buildNextHire(grp){
+  const coverage = teamDomainCoverage(grp.members);
+  renderDomainBars(coverage, grp.members);
+  generateNextHireAI(grp, coverage);
+}
+
+function renderDomainBars(coverage, members){
+  const wrap = document.getElementById('domain-bars');
+  wrap.innerHTML = '';
+  const sorted = Object.keys(DOMAINS).sort((a,b) => coverage[a].avg - coverage[b].avg);
+  sorted.forEach(d => {
+    const c = coverage[d];
+    const isGap = c.avg < 50;
+    wrap.innerHTML += `
+      <div class="trait-row">
+        <div class="trait-top">
+          <span class="trait-name">${DOMAINS[d].label}${isGap ? ' <span class="tag tag-red" style="margin-left:6px">Gap</span>' : ''}</span>
+          <span class="trait-pct">${c.avg}% · strongest: ${c.topMember}</span>
+        </div>
+        <div class="trait-bar"><div class="trait-fill" style="width:${c.avg}%;background:${DOMAIN_COLORS[d]}"></div></div>
+        <div class="muted" style="margin-top:4px;font-size:11px">${DOMAINS[d].desc}</div>
+      </div>`;
+  });
+}
+
+async function generateNextHireAI(grp, coverage){
+  const el = document.getElementById('nexthire-ai');
+  const profiles = grp.members.map(m => `${m.name} (${m.archetype}, roles: ${(m.roles&&m.roles.join('/'))||'unspecified'}): ${traitLine(m)}`).join('\n');
+  const coverageLine = Object.keys(DOMAINS).map(d => `${DOMAINS[d].label}: ${coverage[d].avg}% (strongest: ${coverage[d].topMember})`).join('\n');
+  const weakest = Object.keys(DOMAINS).sort((a,b) => coverage[a].avg - coverage[b].avg)[0];
+
+  const prompt = `You are a CEO-level talent strategist applying CliftonStrengths domain theory (Executing, Influencing, Relationship Building, Strategic Thinking) to a founding/leadership team's hiring plan.
+
+Team profiles (OCEAN, mapped to CliftonStrengths domains):
+${profiles}
+
+Team domain coverage:
+${coverageLine}
+
+The weakest domain is: ${DOMAINS[weakest].label}.
+
+Write a HYPER-PERFORMANCE HIRING BRIEF covering:
+1. **The gap** — name the specific capability and personality gap in the team in plain language, tied to the weakest domain and why it's costing them now
+2. **The role** — propose a specific C-level or senior title (e.g. COO, Head of Ops, CFO, VP Sales) that would close this gap, and what function they'd own
+3. **Required skills** — 4-6 concrete hard skills/experience this hire needs
+4. **Required personality profile** — target OCEAN ranges for this hire (e.g. "Conscientiousness 75-90%, Extraversion 30-50%") and why that specific combination balances the existing team rather than duplicating it
+5. **Hyper-performance fit test** — 3 sharp interview questions or signals that would reveal whether a candidate actually closes this gap versus just looking good on paper
+6. **What changes once hired** — concretely describe how team dynamics and output improve once this gap is closed
+
+Be specific to THESE individuals, not generic startup advice. ~480 words. Bold inline labels, no markdown headers.`;
+
+  try{
+    const result = await callAI(prompt);
+    el.innerHTML = `<div class="ai-output">${result}</div>`;
+  }catch(e){
+    el.innerHTML = `<p class="muted">Could not generate hiring brief. Please refresh and try again.</p>`;
+  }
 }
 </script>
 </body>
