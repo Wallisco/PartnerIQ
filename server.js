@@ -536,6 +536,20 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// ── Marketing homepage ────────────────────────────────────────────────────────
+// Serves the marketing site (home.html) at the root URL.
+// The assessment app (index.html) is served for all other routes via the catch-all below.
+app.get('/', (req, res) => {
+  const homePath = path.join(__dirname, 'public', 'home.html');
+  const fs = require('fs');
+  if (fs.existsSync(homePath)) {
+    res.sendFile(homePath);
+  } else {
+    // Fall back to app if home.html not yet added
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+});
+
 // ── Catch-all — serve frontend ────────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
