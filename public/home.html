@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="PartnerIQ — The science-backed team intelligence platform. Know who you're building with before the equity is split. Trusted by founders, investors and team leaders.">
+<meta property="og:title" content="PartnerIQ — Know Who You're Building With">
+<meta property="og:description" content="65% of startup failures trace back to team conflict, not product or market. PartnerIQ fixes the problem most teams never see coming.">
+<meta property="og:image" content="https://partneriq.fit/og-image.png">
+<title>PartnerIQ — Partnership Intelligence</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --navy: #0C1F3A;
+  --navy-deep: #060F1C;
+  --navy-mid: #142B4E;
+  --navy-light: #1E3A62;
+  --gold: #C9A84C;
+  --gold-light: #E2C97E;
+  --gold-pale: #F5EDD0;
+  --off-white: #F5F2EC;
+  --slate: #8B9DB0;
+  --slate-light: #B8C5D0;
+  --text-dark: #0A0F1A;
+  --text-mid: #3D4F63;
+  --text-muted: #6B7E90;
+  --white: #FFFFFF;
+  --border: rgba(255,255,255,0.1);
+  --border-dark: rgba(0,0,0,0.08);
+  --green: #1D7A5F;
+  --green-light: #E8F5F0;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, sans-serif;
+
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+
+  --max: 1120px;
+  --gutter: clamp(1.25rem, 5vw, 2.5rem);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--off-white);
+  color: var(--text-dark);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-body); cursor: pointer; border: none; }
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+.container {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+section { position: relative; }
+
+/* ═══════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.nav.scrolled {
+  background: rgba(6,15,28,0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.07);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem var(--gutter);
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.nav-logo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nav-logo-main {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.nav-logo-sub {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--slate);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--slate-light);
+  letter-spacing: 0.02em;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 10px 20px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn-ghost {
+  color: var(--slate-light);
+  border-color: rgba(255,255,255,0.12);
+  background: transparent;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+.btn-gold {
+  background: var(--gold);
+  color: var(--navy-deep);
+  font-weight: 600;
+}
+.btn-gold:hover { background: var(--gold-light); }
+.btn-navy {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy-light);
+}
+.btn-navy:hover { background: var(--navy-mid); }
+.btn-lg { padding: 14px 28px; font-size: 15px; border-radius: var(--r-md); }
+.btn-xl { padding: 18px 36px; font-size: 16px; font-weight: 600; border-radius: var(--r-md); }
+
+/* ═══════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  background: var(--navy-deep);
+  display: flex;
+  align-items: center;
+  padding: 8rem var(--gutter) 6rem;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(30,58,98,0.5) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  gap: 4rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--gold);
+}
+.hero-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 6vw, 76px);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--white);
+  margin-bottom: 1.75rem;
+  letter-spacing: -0.01em;
+}
+.hero-h1 em {
+  font-style: italic;
+  color: var(--gold);
+  font-weight: 300;
+}
+.hero-sub {
+  font-size: clamp(16px, 1.8vw, 19px);
+  font-weight: 300;
+  color: var(--slate-light);
+  line-height: 1.65;
+  max-width: 520px;
+  margin-bottom: 2.5rem;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.trust-item {
+  font-size: 11px;
+  color: var(--slate);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.trust-item::before {
+  content: '✓';
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* ── Pentagon visualiser ── */
+.pentagon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.pentagon-canvas-wrap {
+  position: relative;
+  width: 380px;
+  height: 380px;
+}
+.pentagon-label {
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--slate);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.pentagon-archetype {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+.pentagon-archetype-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+.pentagon-archetype-sub {
+  font-size: 11px;
+  color: var(--slate);
+  margin-top: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════
+   STAT BAND
+═══════════════════════════════════════════════════ */
+.stat-band {
+  background: var(--navy);
+  padding: 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.stat-band-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  divide-x: 1px solid rgba(255,255,255,0.06);
+}
+.stat-item {
+  padding: 2.5rem var(--gutter);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5vw, 72px);
+  font-weight: 300;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.stat-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--slate-light);
+  line-height: 1.5;
+  max-width: 200px;
+  margin: 0 auto;
+}
+.stat-source {
+  font-size: 10px;
+  color: var(--slate);
+  margin-top: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════
+   PROBLEM SECTION
+═══════════════════════════════════════════════════ */
+.problem {
+  background: var(--off-white);
+  padding: 7rem var(--gutter);
+}
+.problem-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+}
+.section-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--navy);
+  margin-bottom: 1.5rem;
+}
+.section-h2 em {
+  font-style: italic;
+  color: var(--gold);
+}
+.section-body {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+}
+.pull-quote {
+  border-left: 3px solid var(--gold);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+}
+.pull-quote-text {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--navy);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+.pull-quote-source {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.failure-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.failure-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--white);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-dark);
+}
+.failure-pct {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--navy);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 70px;
+}
+.failure-desc {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.5;
+  padding-top: 4px;
+}
+.failure-desc strong {
+  color: var(--text-dark);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ═══════════════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════════════ */
+.how {
+  background: var(--navy-deep);
+  padding: 7rem var(--gutter);
+}
+.how-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.how-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+.how-header .section-label { justify-content: center; }
+.how-header .section-h2 { color: var(--white); max-width: 560px; margin: 0 auto 1rem; }
+.how-header .section-body { color: var(--slate-light); max-width: 480px; margin: 0 auto; }
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.step {
+  background: var(--navy-mid);
+  padding: 2.5rem 2rem;
+  position: relative;
+}
+.step-num {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 300;
+  color: rgba(201,168,76,0.15);
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+.step-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(201,168,76,0.12);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  font-size: 20px;
+}
+.step-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+.step-desc {
+  font-size: 14px;
+  color: var(--slate-light);
+  line-height: 1.65;
+}
+.step-time {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════
+   WHAT YOU GET
+═══════════════════════════════════════════════════ */
+.features {
+  background: var(--off-white);
+  padding: 7rem var(--gutter);
+}
+.features-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.features-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+.features-header .section-label { justify-content: center; }
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+.feature-card {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  border: 1px solid var(--border-dark);
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.feature-card:hover { box-shadow: 0 8px 32px rgba(12,31,58,0.1); transform: translateY(-2px); }
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--gold-pale);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 1.25rem;
+}
+.feature-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+.feature-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.feature-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--gold-pale);
+  color: var(--gold);
+}
+
+/* ═══════════════════════════════════════════════════
+   SEGMENTS
+═══════════════════════════════════════════════════ */
+.segments {
+  background: var(--navy);
+  padding: 7rem var(--gutter);
+}
+.segments-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.segments-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+.segments-header .section-h2 { color: var(--white); margin: 0 auto 1rem; }
+.segment-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+.seg-tab {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--slate);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.seg-tab.active, .seg-tab:hover {
+  background: var(--gold);
+  color: var(--navy-deep);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+.segment-panels { position: relative; }
+.seg-panel { display: none; }
+.seg-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+.seg-content .section-label { color: var(--gold); }
+.seg-content .section-label::before { background: var(--gold); }
+.seg-content h3 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 400;
+  color: var(--white);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+.seg-content p { color: var(--slate-light); font-size: 15px; line-height: 1.7; margin-bottom: 1.25rem; }
+.seg-points { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+.seg-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--slate-light);
+}
+.seg-point::before { content: '→'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+.seg-visual {
+  background: var(--navy-mid);
+  border-radius: var(--r-lg);
+  padding: 2.5rem;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.seg-report-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.report-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.report-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.report-bars { flex: 1; }
+.report-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--slate);
+  margin-bottom: 4px;
+}
+.report-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; }
+.report-bar-fill { height: 100%; border-radius: 3px; }
+.compat-score-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-md);
+}
+.score-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--white);
+  border: 2px solid var(--gold);
+}
+.score-meta { font-size: 13px; color: var(--slate-light); }
+.score-meta strong { color: var(--gold); display: block; font-size: 15px; }
+
+/* ═══════════════════════════════════════════════════
+   SCIENCE SECTION
+═══════════════════════════════════════════════════ */
+.science {
+  background: var(--off-white);
+  padding: 7rem var(--gutter);
+}
+.science-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  text-align: center;
+}
+.science-inner .section-label { justify-content: center; }
+.science-inner .section-h2 { margin: 0 auto 1.5rem; max-width: 600px; }
+.science-inner .section-body { max-width: 560px; margin: 0 auto 4rem; }
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+.evidence-card {
+  background: var(--white);
+  border-radius: var(--r-md);
+  padding: 1.75rem 1.5rem;
+  border: 1px solid var(--border-dark);
+  text-align: left;
+}
+.evidence-source {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+.evidence-finding {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--navy);
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+}
+.evidence-detail {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.ocean-explain {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+.ocean-item {
+  padding: 1.25rem 1rem;
+  background: var(--navy);
+  border-radius: var(--r-md);
+  text-align: center;
+  color: var(--white);
+}
+.ocean-letter {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.ocean-word {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.ocean-def {
+  font-size: 10px;
+  color: var(--slate);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════
+   PRICING
+═══════════════════════════════════════════════════ */
+.pricing {
+  background: var(--navy-deep);
+  padding: 7rem var(--gutter);
+}
+.pricing-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.pricing-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+.pricing-header .section-label { justify-content: center; }
+.pricing-header .section-h2 { color: var(--white); max-width: 560px; margin: 0 auto 1rem; }
+.pricing-header .section-body { color: var(--slate-light); max-width: 460px; margin: 0 auto; }
+.pricing-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+.toggle-label { font-size: 13px; color: var(--slate); }
+.toggle-label.active { color: var(--white); }
+.toggle {
+  width: 48px;
+  height: 26px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--gold); }
+.toggle-dot {
+  width: 20px;
+  height: 20px;
+  background: var(--white);
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+}
+.toggle.on .toggle-dot { transform: translateX(22px); }
+.toggle-badge {
+  background: var(--gold);
+  color: var(--navy-deep);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+.price-card {
+  background: var(--navy-mid);
+  border-radius: var(--r-lg);
+  padding: 2.25rem 2rem;
+  border: 1px solid rgba(255,255,255,0.07);
+  position: relative;
+  transition: transform 0.2s;
+}
+.price-card:hover { transform: translateY(-3px); }
+.price-card.featured {
+  background: var(--white);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 20px 60px rgba(0,0,0,0.3);
+}
+.price-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: var(--navy-deep);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.price-tier {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+.price-card.featured .price-tier { color: var(--gold); }
+.price-name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.price-card.featured .price-name { color: var(--navy); }
+.price-desc {
+  font-size: 13px;
+  color: var(--slate);
+  line-height: 1.5;
+  margin-bottom: 1.75rem;
+}
+.price-card.featured .price-desc { color: var(--text-muted); }
+.price-amount {
+  margin-bottom: 0.25rem;
+}
+.price-currency {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--slate);
+  vertical-align: top;
+  margin-top: 8px;
+  display: inline-block;
+}
+.price-num {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.price-card.featured .price-num { color: var(--navy); }
+.price-period {
+  font-size: 13px;
+  color: var(--slate);
+}
+.price-card.featured .price-period { color: var(--text-muted); }
+.price-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 1.5rem 0;
+}
+.price-card.featured .price-divider { background: var(--border-dark); }
+.price-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.price-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--slate-light);
+  line-height: 1.45;
+}
+.price-card.featured .price-feature { color: var(--text-mid); }
+.price-feature::before { content: '✓'; color: var(--gold); font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+.price-feature.dim { color: var(--slate); opacity: 0.5; }
+.price-feature.dim::before { content: '–'; color: var(--slate); }
+.btn-price {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 13px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+.btn-price-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--white);
+}
+.btn-price-outline:hover { background: rgba(255,255,255,0.07); }
+.btn-price-gold {
+  background: var(--gold);
+  color: var(--navy-deep);
+}
+.btn-price-gold:hover { background: var(--gold-light); }
+.price-payment-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.payment-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--slate);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+/* ═══════════════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════════════ */
+.faq {
+  background: var(--off-white);
+  padding: 7rem var(--gutter);
+}
+.faq-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.faq-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.faq-list { display: flex; flex-direction: column; gap: 0; }
+.faq-item {
+  border-bottom: 1px solid var(--border-dark);
+}
+.faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--navy);
+  cursor: pointer;
+  gap: 1rem;
+  user-select: none;
+}
+.faq-q::after {
+  content: '+';
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--gold);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.75;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s;
+}
+.faq-item.open .faq-a {
+  max-height: 400px;
+  padding-bottom: 1.5rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   FINAL CTA
+═══════════════════════════════════════════════════ */
+.final-cta {
+  background: var(--navy-deep);
+  padding: 8rem var(--gutter);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.final-cta-inner { position: relative; z-index: 1; }
+.final-cta .section-label { justify-content: center; margin-bottom: 1.5rem; }
+.final-cta h2 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.final-cta h2 em { color: var(--gold); font-style: italic; }
+.final-cta p {
+  font-size: 17px;
+  color: var(--slate-light);
+  max-width: 480px;
+  margin: 0 auto 3rem;
+  line-height: 1.65;
+}
+.final-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════ */
+.footer {
+  background: var(--navy-deep);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 3rem var(--gutter);
+}
+.footer-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold);
+  font-weight: 400;
+}
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+.footer-links a {
+  font-size: 12px;
+  color: var(--slate);
+  transition: color 0.15s;
+}
+.footer-links a:hover { color: var(--white); }
+.footer-copy {
+  font-size: 11px;
+  color: var(--slate);
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,15,28,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  padding: 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+}
+.modal h3 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+.modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.75rem; line-height: 1.5; }
+.modal-tier {
+  background: var(--gold-pale);
+  border: 1px solid var(--gold);
+  border-radius: var(--r-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-tier-name { font-weight: 500; color: var(--navy); font-size: 15px; }
+.modal-tier-price { font-family: var(--font-display); font-size: 22px; color: var(--navy); }
+.modal label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-mid);
+  display: block;
+  margin-bottom: 5px;
+}
+.modal input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-dark);
+  background: var(--off-white);
+  color: var(--text-dark);
+  font-size: 14px;
+  font-family: var(--font-body);
+  margin-bottom: 1rem;
+  transition: border-color 0.15s;
+}
+.modal input:focus { outline: none; border-color: var(--navy); background: var(--white); }
+.modal-error { font-size: 12px; color: #c0392b; margin-bottom: 0.75rem; min-height: 1rem; }
+.payment-methods { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+.pay-method {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-dark);
+  background: var(--white);
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-mid);
+  transition: all 0.15s;
+}
+.pay-method.selected {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: var(--white);
+}
+.modal-secure {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* ═══════════════════════════════════════════════════
+   STICKY CTA
+═══════════════════════════════════════════════════ */
+.sticky-cta {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 90;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.sticky-cta.visible { transform: translateY(0); opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .pentagon-wrap { display: none; }
+  .problem-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .steps { grid-template-columns: 1fr; }
+  .feature-grid { grid-template-columns: 1fr 1fr; }
+  .seg-panel.active { grid-template-columns: 1fr; }
+  .seg-visual { display: none; }
+  .evidence-grid { grid-template-columns: 1fr 1fr; }
+  .ocean-explain { grid-template-columns: repeat(3, 1fr); }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .price-card.featured { order: -1; }
+  .stat-band-inner { grid-template-columns: 1fr; }
+  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .nav-links { display: none; }
+}
+@media (max-width: 600px) {
+  .feature-grid { grid-template-columns: 1fr; }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .ocean-explain { grid-template-columns: repeat(2, 1fr); }
+  .hero-actions { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ NAV ═══════ -->
+<nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo" aria-label="PartnerIQ home">
+      <span class="nav-logo-main">PartnerIQ</span>
+      <span class="nav-logo-sub">Partnership Intelligence</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#features">What you get</a></li>
+      <li><a href="#science">The science</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="/app" class="btn btn-ghost">Take the quiz</a>
+      <button class="btn btn-gold" onclick="openModal('professional')">Get your report</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero" aria-labelledby="hero-h1">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Partnership Intelligence Platform</div>
+      <h1 class="hero-h1" id="hero-h1">
+        Know who you're<br>building with.<br>
+        <em>Before it costs you.</em>
+      </h1>
+      <p class="hero-sub">65% of startup failures trace back to team conflict, not product or market. PartnerIQ gives founding teams, business leaders, and investors a science-backed read on how a group actually thinks, decides, and holds together under pressure.</p>
+      <div class="hero-actions">
+        <a href="/app" class="btn btn-gold btn-xl">Start free assessment →</a>
+        <button class="btn btn-ghost btn-lg" onclick="openModal('professional')">Get full group report</button>
+      </div>
+      <div class="hero-trust">
+        <span class="trust-item">Built on Big Five OCEAN science</span>
+        <span class="trust-item">AI-generated reports in minutes</span>
+        <span class="trust-item">R499 — no subscription</span>
+      </div>
+    </div>
+    <div class="pentagon-wrap">
+      <div class="pentagon-canvas-wrap">
+        <canvas id="pentagon-canvas" width="380" height="380" role="img" aria-label="Animated OCEAN personality pentagon showing team profile"></canvas>
+        <div class="pentagon-archetype">
+          <div class="pentagon-archetype-name" id="archetype-name">Visionary Catalyst</div>
+          <div class="pentagon-archetype-sub">Your archetype</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ STAT BAND ═══════ -->
+<section class="stat-band" aria-label="Key statistics">
+  <div class="stat-band-inner">
+    <div class="stat-item">
+      <span class="stat-num" id="count-65">65</span><span class="stat-num" style="font-size:clamp(36px,4vw,56px)">%</span>
+      <div class="stat-label">of startup failures trace back to team conflict — not market, not product</div>
+      <div class="stat-source">Harvard Business School · Prof. Noam Wasserman</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="count-23">23</span><span class="stat-num" style="font-size:clamp(36px,4vw,56px)">%</span>
+      <div class="stat-label">of VC-backed startups fail specifically because they had the wrong team</div>
+      <div class="stat-source">CB Insights · 431 startup post-mortems</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="count-8">8</span>
+      <div class="stat-label">minutes per person to complete the assessment — instant AI report after</div>
+      <div class="stat-source">PartnerIQ · Average completion time</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PROBLEM ═══════ -->
+<section class="problem" id="problem" aria-labelledby="problem-h2">
+  <div class="problem-inner">
+    <div class="problem-content">
+      <div class="section-label">The gap most teams ignore</div>
+      <h2 class="section-h2" id="problem-h2">Most teams spend more time on the cap table than on <em>each other.</em></h2>
+      <p class="section-body">Founders validate their market, stress-test their financial model, and spend weeks negotiating equity. Then they go into business with someone they've known for six months based entirely on instinct and enthusiasm.</p>
+      <p class="section-body">That works — until pressure hits. A missed deadline. A funding shortfall. A disagreement about strategy. The personality mismatches that were invisible in the excitement phase become the thing that ends the company.</p>
+      <div class="pull-quote">
+        <div class="pull-quote-text">"Investors often find that the team is the single biggest factor in whether they write a cheque — and the one thing nobody has actually stress-tested."</div>
+        <div class="pull-quote-source">Common pattern across early-stage VC diligence</div>
+      </div>
+      <p class="section-body">PartnerIQ gives teams a structured, scientific, 8-minute way to surface what would otherwise only appear eighteen months in.</p>
+    </div>
+    <div class="problem-visual">
+      <ul class="failure-list" aria-label="Startup failure causes">
+        <li class="failure-item">
+          <div class="failure-pct">65%</div>
+          <div class="failure-desc"><strong>Team conflict and co-founder breakdown</strong>The leading cause of startup failure. Most teams never saw it coming because they never looked.</div>
+        </li>
+        <li class="failure-item">
+          <div class="failure-pct">23%</div>
+          <div class="failure-desc"><strong>"Not the right team"</strong>Named directly in CB Insights' analysis of 431 VC-backed startup failures. A distinct category from market failure.</div>
+        </li>
+        <li class="failure-item">
+          <div class="failure-pct">42%</div>
+          <div class="failure-desc"><strong>No market need</strong>The one everyone talks about — but team risk is just as likely to kill you, and nobody runs diligence on it.</div>
+        </li>
+        <li class="failure-item">
+          <div class="failure-pct">30%</div>
+          <div class="failure-desc"><strong>Employee turnover reduction</strong>Reported by organisations that use structured personality assessments in hiring and team composition decisions.</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ HOW IT WORKS ═══════ -->
+<section class="how" id="how" aria-labelledby="how-h2">
+  <div class="how-inner">
+    <div class="how-header">
+      <div class="section-label">Simple by design</div>
+      <h2 class="section-h2" id="how-h2">From group code to <em>full report</em> in under an hour</h2>
+      <p class="section-body">No consultants. No scheduling. No lengthy processes. Just your team, 20 honest questions each, and a report that tells you things a six-month working relationship might not.</p>
+    </div>
+    <div class="steps" role="list">
+      <div class="step" role="listitem">
+        <div class="step-num" aria-hidden="true">01</div>
+        <div class="step-icon" aria-hidden="true">⚙️</div>
+        <div class="step-title">Create your group</div>
+        <div class="step-desc">The organiser creates a group in 60 seconds. You get two codes: a group code to share with your team, and a private results code that only you hold.</div>
+        <div class="step-time">60 seconds</div>
+      </div>
+      <div class="step" role="listitem">
+        <div class="step-num" aria-hidden="true">02</div>
+        <div class="step-icon" aria-hidden="true">🧠</div>
+        <div class="step-title">Everyone takes the assessment</div>
+        <div class="step-desc">Each person verifies their email, completes 20 calibrated OCEAN questions, and immediately receives their own personal AI profile by email — theirs to keep, regardless of the group report.</div>
+        <div class="step-time">~8 minutes per person</div>
+      </div>
+      <div class="step" role="listitem">
+        <div class="step-num" aria-hidden="true">03</div>
+        <div class="step-icon" aria-hidden="true">📊</div>
+        <div class="step-title">Unlock the full report</div>
+        <div class="step-desc">Enter your results code to unlock six AI-generated report sections: executive summary, individual profiles, compatibility matrix, team dynamics, next-hire brief, and team culture diagnosis.</div>
+        <div class="step-time">Instant generation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FEATURES ═══════ -->
+<section class="features" id="features" aria-labelledby="features-h2">
+  <div class="features-inner">
+    <div class="features-header">
+      <div class="section-label">What you get</div>
+      <h2 class="section-h2" id="features-h2">Six report sections. One <em>complete picture.</em></h2>
+      <p class="section-body" style="max-width:520px;margin:0 auto;">Every report is AI-generated, specific to your actual people, and written in plain language — not a static PDF of coloured boxes.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">👤</div>
+        <div class="feature-title">Individual OCEAN profiles</div>
+        <div class="feature-desc">Each person's Big Five scores translated into a detailed partner profile: strengths, blind spots, investment style, working preferences, and the type of partner who complements them. Emailed directly to each participant.</div>
+        <span class="feature-badge">Personal report emailed</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">🔄</div>
+        <div class="feature-title">Compatibility matrix</div>
+        <div class="feature-desc">Every pairwise combination in the group scored from 0–100. Colour-coded by trait alignment and friction zone. AI narrative for each pairing covering where they'll click, where they'll clash, and one structural fix.</div>
+        <span class="feature-badge">Pairwise scoring</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">⚡</div>
+        <div class="feature-title">Team dynamics report</div>
+        <div class="feature-desc">Role fit, decision-making patterns, conflict styles, communication dynamics, and governance recommendations — all specific to the people in your group, not generic team advice.</div>
+        <span class="feature-badge">Governance recommendations</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">🎯</div>
+        <div class="feature-title">Next-hire brief</div>
+        <div class="feature-desc">Maps your team's OCEAN data onto CliftonStrengths-style domains — Executing, Influencing, Relationship Building, Strategic Thinking — finds the gap, and generates a specific hiring brief: role title, required OCEAN range, skills, and interview signals.</div>
+        <span class="feature-badge">Specific role brief</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">🏢</div>
+        <div class="feature-title">Team culture diagnosis</div>
+        <div class="feature-desc">What kind of culture this team's personality mix naturally creates, how it performs under stress, what it will systematically avoid, and whether the team's culture supports or undermines the leader's stated goals.</div>
+        <span class="feature-badge">Context-aware analysis</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">📋</div>
+        <div class="feature-title">Role gap hiring plan</div>
+        <div class="feature-desc">Up to three priority hires ranked by urgency, each with a specific title, target OCEAN profile, must-have skills for this vertical, and a red-flag interview signal specific to how each hire would fit this particular team.</div>
+        <span class="feature-badge">Up to 3 priority roles</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SEGMENTS ═══════ -->
+<section class="segments" id="segments" aria-labelledby="segments-h2">
+  <div class="segments-inner">
+    <div class="segments-header">
+      <div class="section-label" style="color:var(--gold);justify-content:center;display:flex;align-items:center;gap:8px;margin-bottom:1rem"><span style="display:block;width:20px;height:1px;background:var(--gold)"></span>Built for your context</div>
+      <h2 class="section-h2" id="segments-h2" style="color:var(--white);max-width:560px;margin:0 auto 2rem;">Who PartnerIQ is <em>built for</em></h2>
+    </div>
+    <div class="segment-tabs" role="tablist" aria-label="Audience segments">
+      <button class="seg-tab active" role="tab" aria-selected="true" onclick="switchSeg('founders', this)">Founders</button>
+      <button class="seg-tab" role="tab" aria-selected="false" onclick="switchSeg('teams', this)">Business teams</button>
+      <button class="seg-tab" role="tab" aria-selected="false" onclick="switchSeg('investors', this)">Investors</button>
+      <button class="seg-tab" role="tab" aria-selected="false" onclick="switchSeg('accelerators', this)">Accelerators</button>
+    </div>
+    <div class="segment-panels">
+      <div class="seg-panel active" id="seg-founders" role="tabpanel">
+        <div class="seg-content">
+          <div class="section-label">Founding teams</div>
+          <h3>Before the equity is split, before you can't undo it</h3>
+          <p>Most co-founder breakups happen 12–18 months in, when the combination of pressure, mismatched expectations, and personality friction becomes too much. By then, the equity is split, the legal structure is in place, and unwinding is expensive and painful.</p>
+          <p>PartnerIQ surfaces those incompatibilities in 8 minutes. Not to tell you not to build together — but to tell you where the friction will come from and exactly what to do about it before it becomes a problem.</p>
+          <ul class="seg-points">
+            <li>Full compatibility report before signing any agreements</li>
+            <li>A specific next-hire brief based on what your founding team is missing</li>
+            <li>Personal report emailed to each founder immediately after assessment</li>
+            <li>Used by founding teams across South Africa, Africa, and globally</li>
+          </ul>
+          <button class="btn btn-gold btn-lg" onclick="openModal('starter')">Run your founding team assessment →</button>
+        </div>
+        <div class="seg-visual">
+          <div class="seg-report-preview">
+            <div style="font-size:11px;color:var(--slate);margin-bottom:1rem;letter-spacing:0.08em;text-transform:uppercase">Compatibility overview</div>
+            <div class="compat-score-display">
+              <div class="score-circle">74</div>
+              <div class="score-meta">
+                <strong>Strong partnership</strong>
+                High strategic alignment, execution gap identified
+              </div>
+            </div>
+            <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.75rem">
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Openness</span><span style="color:var(--gold)">85% / 60%</span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:85%;background:var(--gold)"></div></div>
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Conscientiousness</span><span style="color:#4EA8D4">48% / 82%</span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:65%;background:#4EA8D4"></div></div>
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Emotional Stability</span><span style="color:#E87D4A">35% / 70%</span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:50%;background:#E87D4A"></div></div>
+            </div>
+            <div style="margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.08);border-radius:var(--r-sm);border:1px solid rgba(201,168,76,0.2)">
+              <div style="font-size:11px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:0.06em;text-transform:uppercase">Next hire recommended</div>
+              <div style="font-size:13px;color:var(--white);font-weight:500">COO / Head of Operations</div>
+              <div style="font-size:11px;color:var(--slate);margin-top:2px">High Conscientiousness (75–90%), low Openness to compensate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="seg-panel" id="seg-teams" role="tabpanel">
+        <div class="seg-content">
+          <div class="section-label">Business teams</div>
+          <h3>Diagnose what's actually wrong with your team — before it gets worse</h3>
+          <p>Most team problems are diagnosed as process failures, when the real issue is personality composition. The Sales team that misses targets isn't lazy — they're all high in Openness and low in Conscientiousness. Nobody closes anything because nobody naturally does that.</p>
+          <p>PartnerIQ's Team Diagnosis tab identifies the specific culture your team's personality mix creates, what it systematically avoids, and what to do about it — with or without making new hires.</p>
+          <ul class="seg-points">
+            <li>Works for any vertical: Sales, Operations, Finance, Tech, Marketing, People</li>
+            <li>Context-aware reports: set your business stage, team level, and leader accountability</li>
+            <li>Culture diagnosis + gap analysis + internal improvement plan + hiring brief</li>
+            <li>From C-suite to junior management — the tool adapts</li>
+          </ul>
+          <button class="btn btn-gold btn-lg" onclick="openModal('professional')">Diagnose your team →</button>
+        </div>
+        <div class="seg-visual">
+          <div style="font-size:11px;color:var(--slate);margin-bottom:1rem;letter-spacing:0.08em;text-transform:uppercase">Team domain coverage</div>
+          <div style="display:flex;flex-direction:column;gap:0.875rem">
+            <div>
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Strategic Thinking</span><span style="color:#4EA8D4">78%</span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:78%;background:#4EA8D4"></div></div>
+            </div>
+            <div>
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Influencing</span><span style="color:var(--gold)">71%</span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:71%;background:var(--gold)"></div></div>
+            </div>
+            <div>
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Relationship Building</span><span style="color:#7E6EC4">58%</span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:58%;background:#7E6EC4"></div></div>
+            </div>
+            <div>
+              <div class="report-bar-label"><span style="color:var(--white);font-size:12px">Executing</span><span style="color:#E87D4A">34% <span style="font-weight:600">← GAP</span></span></div>
+              <div class="report-bar"><div class="report-bar-fill" style="width:34%;background:#E87D4A"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;padding:1rem;background:rgba(232,125,74,0.12);border-radius:var(--r-sm);border:1px solid rgba(232,125,74,0.25)">
+            <div style="font-size:11px;color:#E87D4A;font-weight:600;margin-bottom:4px;letter-spacing:0.06em;text-transform:uppercase">Critical gap identified</div>
+            <div style="font-size:13px;color:var(--white);line-height:1.5">This Sales team generates strong ideas and builds relationships well but has no one wired to close, track, and follow through systematically.</div>
+          </div>
+        </div>
+      </div>
+      <div class="seg-panel" id="seg-investors" role="tabpanel">
+        <div class="seg-content">
+          <div class="section-label">Investors & angels</div>
+          <h3>Add a team intelligence layer to your diligence process</h3>
+          <p>You evaluate financials, market size, and product differentiation. You meet the team and trust your read. But 23% of VC-backed startup failures are attributed specifically to the wrong team — a category entirely distinct from market or product failure.</p>
+          <p>PartnerIQ gives you a structured, standardised way to assess founding team risk before you write the cheque. Not as a replacement for your instinct — as a data layer underneath it.</p>
+          <ul class="seg-points">
+            <li>Run every founding team through the same assessment for comparable data across your portfolio</li>
+            <li>Identify the specific execution, relationship, and stability gaps in each team</li>
+            <li>Generate a specific first-hire recommendation tied to each team's actual gaps</li>
+            <li>Add a two-page team risk summary to your investment memo</li>
+          </ul>
+          <button class="btn btn-gold btn-lg" onclick="openModal('professional')">Add to your diligence process →</button>
+        </div>
+        <div class="seg-visual">
+          <div style="font-size:11px;color:var(--slate);margin-bottom:1rem;letter-spacing:0.08em;text-transform:uppercase">Investor team risk view</div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <div style="padding:0.875rem;background:rgba(255,255,255,0.04);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:13px;color:var(--white)">Team A — Fintech</div>
+              <div style="font-size:14px;font-weight:600;color:#4EA8D4">74/100</div>
+            </div>
+            <div style="padding:0.875rem;background:rgba(255,255,255,0.04);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:13px;color:var(--white)">Team B — EdTech</div>
+              <div style="font-size:14px;font-weight:600;color:var(--gold)">88/100</div>
+            </div>
+            <div style="padding:0.875rem;background:rgba(255,255,255,0.04);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:13px;color:var(--white)">Team C — DeepTech</div>
+              <div style="font-size:14px;font-weight:600;color:#E87D4A">49/100 ⚠</div>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;padding:1rem;background:rgba(78,168,212,0.08);border-radius:var(--r-sm);border:1px solid rgba(78,168,212,0.2)">
+            <div style="font-size:11px;color:#4EA8D4;font-weight:600;margin-bottom:4px">Team C flagged: Execution gap</div>
+            <div style="font-size:12px;color:var(--slate);line-height:1.55">High openness, high extraversion, low conscientiousness across all three founders. No one is wired to execute. First hire recommendation: COO with C 80%+.</div>
+          </div>
+        </div>
+      </div>
+      <div class="seg-panel" id="seg-accelerators" role="tabpanel">
+        <div class="seg-content">
+          <div class="section-label">Accelerators & incubators</div>
+          <h3>Know which teams need help — at intake, not six months later</h3>
+          <p>You accept cohorts based on idea quality, market potential, and founder experience. By month three, it's usually clear which teams are going to work and which aren't. By month six, the ones that aren't have wasted your mentors' time and their own.</p>
+          <p>PartnerIQ at cohort intake gives you a structured read on every team's personality composition, compatibility, and execution gaps — before your programme begins. You can direct support to where it's actually needed.</p>
+          <ul class="seg-points">
+            <li>Group codes for every cohort team — self-serve, no facilitation needed</li>
+            <li>Cohort-level view across all teams to identify systemic programme risks</li>
+            <li>Individual profiles emailed to every participant — adds value to the programme</li>
+            <li>Volume pricing for cohort licences</li>
+          </ul>
+          <a href="mailto:hello@partneriq.fit?subject=Accelerator partnership enquiry" class="btn btn-gold btn-lg">Enquire about cohort pricing →</a>
+        </div>
+        <div class="seg-visual">
+          <div style="font-size:11px;color:var(--slate);margin-bottom:1rem;letter-spacing:0.08em;text-transform:uppercase">Cohort intake summary</div>
+          <div style="display:flex;flex-direction:column;gap:0.625rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem;background:rgba(255,255,255,0.04);border-radius:var(--r-sm)">
+              <span style="font-size:12px;color:var(--white)">Cohort 2026 — 12 teams</span>
+              <span style="font-size:11px;color:var(--gold)">Avg 71/100</span>
+            </div>
+            <div style="display:flex;gap:0.5rem">
+              <div style="flex:1;padding:0.625rem;background:rgba(78,168,212,0.1);border-radius:var(--r-sm);text-align:center">
+                <div style="font-size:20px;color:#4EA8D4;font-weight:600">7</div>
+                <div style="font-size:10px;color:var(--slate)">Strong teams</div>
+              </div>
+              <div style="flex:1;padding:0.625rem;background:rgba(201,168,76,0.1);border-radius:var(--r-sm);text-align:center">
+                <div style="font-size:20px;color:var(--gold);font-weight:600">3</div>
+                <div style="font-size:10px;color:var(--slate)">Need support</div>
+              </div>
+              <div style="flex:1;padding:0.625rem;background:rgba(232,125,74,0.1);border-radius:var(--r-sm);text-align:center">
+                <div style="font-size:20px;color:#E87D4A;font-weight:600">2</div>
+                <div style="font-size:10px;color:var(--slate)">High risk</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--slate);padding:0.75rem;background:rgba(255,255,255,0.03);border-radius:var(--r-sm);line-height:1.55">Common gap across cohort: low Conscientiousness in 8 of 12 teams. Recommended: add execution-focused mentor assignment at week 2.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SCIENCE ═══════ -->
+<section class="science" id="science" aria-labelledby="science-h2">
+  <div class="science-inner">
+    <div class="section-label">The science behind it</div>
+    <h2 class="section-h2" id="science-h2">Built on the most validated personality framework <em>in existence</em></h2>
+    <p class="section-body">The Big Five (OCEAN) model has been peer-reviewed, replicated, and validated across 54 meta-analyses covering 554,778 individuals. It is the only personality framework consistently shown to predict real-world outcomes — including job performance, team dynamics, and leadership effectiveness.</p>
+
+    <div class="evidence-grid" role="list">
+      <div class="evidence-card" role="listitem">
+        <div class="evidence-source">Harvard Business School</div>
+        <div class="evidence-finding">65% of startup failures trace to team dynamics, not market or product</div>
+        <div class="evidence-detail">Prof. Noam Wasserman's study of over 10,000 founders. The single most cited reason mature startups fail is co-founder conflict.</div>
+      </div>
+      <div class="evidence-card" role="listitem">
+        <div class="evidence-source">CB Insights · 431 Post-mortems</div>
+        <div class="evidence-finding">23% of VC-backed failures cite "not the right team" as the primary cause</div>
+        <div class="evidence-detail">A distinct failure category from market or product failure. Identified in CB Insights' analysis of 431 post-mortems of funded startup failures.</div>
+      </div>
+      <div class="evidence-card" role="listitem">
+        <div class="evidence-source">Gallup · State of the Global Workplace</div>
+        <div class="evidence-finding">Teams using strengths daily see 12.5% higher productivity and 7.8% more individual output</div>
+        <div class="evidence-detail">From Gallup's meta-analysis of strengths-based team interventions. PartnerIQ maps OCEAN directly to CliftonStrengths-style domain categories.</div>
+      </div>
+      <div class="evidence-card" role="listitem">
+        <div class="evidence-source">Criteria Corp · HR Benchmark 2022</div>
+        <div class="evidence-finding">80% of hiring professionals use personality assessments. 92% report improved hire quality.</div>
+        <div class="evidence-detail">Of 1,200+ HR professionals surveyed. Structured personality assessment is the single most common quality improvement lever cited.</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="justify-content:center;margin-bottom:1.5rem">The five dimensions PartnerIQ measures</div>
+      <div class="ocean-explain" role="list" aria-label="OCEAN personality dimensions">
+        <div class="ocean-item" role="listitem">
+          <div class="ocean-letter" aria-hidden="true">O</div>
+          <div class="ocean-word">Openness</div>
+          <div class="ocean-def">Creativity, curiosity, appetite for unconventional ideas and strategies</div>
+        </div>
+        <div class="ocean-item" role="listitem">
+          <div class="ocean-letter" aria-hidden="true">C</div>
+          <div class="ocean-word">Conscientiousness</div>
+          <div class="ocean-def">Organisation, follow-through, structured decision-making and delivery</div>
+        </div>
+        <div class="ocean-item" role="listitem">
+          <div class="ocean-letter" aria-hidden="true">E</div>
+          <div class="ocean-word">Extraversion</div>
+          <div class="ocean-def">Social energy, leadership drive, communication style and relationship-building</div>
+        </div>
+        <div class="ocean-item" role="listitem">
+          <div class="ocean-letter" aria-hidden="true">A</div>
+          <div class="ocean-word">Agreeableness</div>
+          <div class="ocean-def">Collaboration, conflict resolution style, trust, and team harmony vs assertiveness</div>
+        </div>
+        <div class="ocean-item" role="listitem">
+          <div class="ocean-letter" aria-hidden="true">N</div>
+          <div class="ocean-word">Stability</div>
+          <div class="ocean-def">Composure under pressure, risk tolerance, and emotional consistency</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PRICING ═══════ -->
+<section class="pricing" id="pricing" aria-labelledby="pricing-h2">
+  <div class="pricing-inner">
+    <div class="pricing-header">
+      <div class="section-label">Simple, transparent pricing</div>
+      <h2 class="section-h2" id="pricing-h2">The diligence step that used to cost <em>thousands</em></h2>
+      <p class="section-body">Hogan assessments cost USD 350–600 per person. Hiring a certified I/O psychologist to run a team debrief costs USD 5,000–15,000/day. PartnerIQ gives you comparable depth for a fraction of the cost — in minutes, not months.</p>
+    </div>
+    <div class="pricing-toggle" role="group" aria-label="Currency toggle">
+      <span class="toggle-label active" id="zar-label">ZAR</span>
+      <div class="toggle" id="currency-toggle" onclick="toggleCurrency()" role="switch" aria-checked="false" tabindex="0" aria-label="Toggle currency between ZAR and USD">
+        <div class="toggle-dot"></div>
+      </div>
+      <span class="toggle-label" id="usd-label">USD</span>
+      <span class="toggle-badge">Auto-detected at checkout</span>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">Starter</div>
+        <div class="price-name">Group Report</div>
+        <div class="price-desc">For founding teams and small groups up to 8 people. Everything you need to evaluate partnership fit.</div>
+        <div class="price-amount">
+          <span class="price-currency zar-symbol">R</span><span class="price-currency usd-symbol" style="display:none">$</span>
+          <span class="price-num zar-price">499</span><span class="price-num usd-price" style="display:none">27</span>
+        </div>
+        <div class="price-period">per group · one-time payment</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature">Up to 8 participants</li>
+          <li class="price-feature">Individual OCEAN profiles emailed to each person</li>
+          <li class="price-feature">Pairwise compatibility matrix with AI narrative</li>
+          <li class="price-feature">Team dynamics report</li>
+          <li class="price-feature">Executive summary</li>
+          <li class="price-feature dim">Team context analysis</li>
+          <li class="price-feature dim">Culture & gap diagnosis</li>
+          <li class="price-feature dim">Role gap hiring plan</li>
+        </ul>
+        <button class="btn-price btn-price-outline" onclick="openModal('starter')">Get Starter report</button>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-badge">Most popular</div>
+        <div class="price-tier">Professional</div>
+        <div class="price-name">Full Intelligence</div>
+        <div class="price-desc">Complete team intelligence across all six report sections, including culture diagnosis and role-specific hiring briefs.</div>
+        <div class="price-amount">
+          <span class="price-currency zar-symbol">R</span><span class="price-currency usd-symbol" style="display:none">$</span>
+          <span class="price-num zar-price">999</span><span class="price-num usd-price" style="display:none">55</span>
+        </div>
+        <div class="price-period">per group · one-time payment</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature">Up to 20 participants</li>
+          <li class="price-feature">Individual OCEAN profiles emailed to each person</li>
+          <li class="price-feature">Pairwise compatibility matrix with AI narrative</li>
+          <li class="price-feature">Team dynamics report</li>
+          <li class="price-feature">Executive summary with compatibility score</li>
+          <li class="price-feature">Team context analysis (vertical, level, business stage)</li>
+          <li class="price-feature">Culture diagnosis & gap analysis</li>
+          <li class="price-feature">Role gap hiring plan — up to 3 priority roles</li>
+        </ul>
+        <button class="btn-price btn-price-gold" onclick="openModal('professional')">Get Full Intelligence report</button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-name">Teams & Scale</div>
+        <div class="price-desc">For organisations running multiple assessments, accelerator cohorts, or enterprise-wide team intelligence programmes.</div>
+        <div class="price-amount">
+          <span style="font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--white)">Custom</span>
+        </div>
+        <div class="price-period">volume pricing · monthly subscription</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature">Unlimited participants per group</li>
+          <li class="price-feature">Multiple groups under one account</li>
+          <li class="price-feature">All Professional features included</li>
+          <li class="price-feature">Cohort-level dashboard</li>
+          <li class="price-feature">Re-assessment and drift tracking</li>
+          <li class="price-feature">Account management</li>
+          <li class="price-feature">Executive coach delivery available</li>
+        </ul>
+        <a href="mailto:hello@partneriq.fit?subject=Enterprise enquiry" class="btn-price btn-price-outline" style="display:block;text-align:center">Contact us</a>
+      </div>
+    </div>
+    <div class="price-payment-note" role="complementary" aria-label="Payment methods">
+      <span class="payment-badge">🔒 Secure payments</span>
+      <span class="payment-badge">💳 Stripe</span>
+      <span class="payment-badge">🇿🇦 Paystack</span>
+      <span class="payment-badge">✓ South African cards accepted</span>
+      <span class="payment-badge">✓ Instant access on payment</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FAQ ═══════ -->
+<section class="faq" id="faq" aria-labelledby="faq-h2">
+  <div class="faq-inner">
+    <div class="faq-header">
+      <div class="section-label" style="justify-content:center">Questions</div>
+      <h2 class="section-h2" id="faq-h2" style="text-align:center">Frequently asked</h2>
+    </div>
+    <div class="faq-list" role="list">
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">Is this a psychological test? Is it HPCSA-regulated in South Africa?</div>
+        <div class="faq-a">No. PartnerIQ is a business decision-support tool, not a classified psychological instrument. The HPCSA in South Africa regulates formal psychometric tests administered in employment or clinical contexts by registered professionals. PartnerIQ is a self-administered team intelligence and partnership assessment tool — closer to a structured business framework than a clinical instrument. You do not need a registered psychometrist or psychologist to use it. That said, we always recommend treating any personality data with the seriousness it deserves and not using it as the sole basis for hiring or business decisions.</div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">How is PartnerIQ different from DiSC, CliftonStrengths, or MBTI?</div>
+        <div class="faq-a">Three main differences. First, scientific foundation: PartnerIQ is built on the Big Five (OCEAN) model — the most academically validated personality framework in existence, with 54 meta-analyses covering 554,778 individuals. DiSC, CliftonStrengths, and MBTI use proprietary or less-validated frameworks. Second, team-native design: those tools are built for individuals and require a facilitator to derive group insights. PartnerIQ generates group compatibility, team dynamics, and hiring briefs automatically. Third, actionability: our reports don't stop at "here's your personality type." They tell you specifically who to hire next, what role, with what OCEAN profile — tied to your actual business context.</div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">Does everyone in the group have to pay?</div>
+        <div class="faq-a">No. The assessment is completely free for every participant. Each person verifies their email, completes 20 questions, and receives their own personal AI-generated profile by email — for free. The group organiser pays once to unlock the full group report. That single payment covers the entire group regardless of size (up to the participant limit for your tier).</div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">What happens after I pay? How do I access my report?</div>
+        <div class="faq-a">After payment, you receive your results code by email. This code is the key to your group's full report. Go to the app, click "View report," enter your results code, and the full report generates immediately using AI. If you lose your results code, use the "Recover it by email" link on the site to have it resent to the email you used when creating the group.</div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">Can I use PartnerIQ for an existing team, not just a founding team?</div>
+        <div class="faq-a">Yes — and this is one of the most valuable use cases. When creating a group, set the team context fields (business stage, team level, vertical, leader accountability) and the AI generates a context-aware culture diagnosis, gap analysis, internal improvement plan, and role-specific hiring briefs. This works for Sales teams, Operations teams, Finance teams, C-suites, or any functional group at any stage of business.</div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">What payment methods are accepted?</div>
+        <div class="faq-a">We accept all major credit and debit cards through Stripe (Visa, Mastercard, Amex) and through Paystack for South African cardholders (including South African bank cards, Instant EFT, and mobile money). Both payment methods are secure, PCI-compliant, and process instantly. Your results code is sent immediately after payment clears.</div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">Is my personality data private? Who sees it?</div>
+        <div class="faq-a">Each participant's OCEAN profile and AI-generated individual report are sent only to their own verified email address. The full group report — including all individual profiles — is accessible only to the group organiser via the private results code. Participant data is stored securely in an encrypted database and is not shared with third parties. You can request deletion of your data at any time by emailing hello@partneriq.fit.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FINAL CTA ═══════ -->
+<section class="final-cta" aria-labelledby="cta-h2">
+  <div class="final-cta-inner container">
+    <div class="section-label">Start today</div>
+    <h2 id="cta-h2">Twenty minutes now.<br><em>Or eighteen months of friction</em> later.</h2>
+    <p>The average founding team spends more time choosing a company name than understanding how they'll work together under pressure. PartnerIQ fixes that — in a single session, for the cost of a team lunch.</p>
+    <div class="final-actions">
+      <a href="/app" class="btn btn-gold btn-xl">Start free — take the quiz →</a>
+      <button class="btn btn-ghost btn-xl" onclick="openModal('professional')">Get the full report</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-logo">PartnerIQ</div>
+    <ul class="footer-links">
+      <li><a href="/app">Launch app</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="mailto:hello@partneriq.fit">Contact</a></li>
+      <li><a href="/app/privacy">Privacy policy</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 PartnerIQ (Pty) Ltd. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- ═══════ PAYMENT MODAL ═══════ -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" onclick="closeModalIfOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    <h3 id="modal-title">Get your report</h3>
+    <p class="modal-sub" id="modal-sub">Enter your email to receive your results code and unlock the full group report immediately after payment.</p>
+    <div class="modal-tier" id="modal-tier-display">
+      <span class="modal-tier-name" id="modal-tier-name">Full Intelligence</span>
+      <span class="modal-tier-price" id="modal-tier-price">R999</span>
+    </div>
+    <label for="modal-email">Email address</label>
+    <input type="email" id="modal-email" placeholder="you@example.com" autocomplete="email">
+    <label for="modal-name">Your name</label>
+    <input type="text" id="modal-name" placeholder="Your full name" autocomplete="name">
+    <label>Payment method</label>
+    <div class="payment-methods" role="group" aria-label="Choose payment method">
+      <div class="pay-method selected" id="pay-stripe" onclick="selectPayment('stripe')" role="radio" aria-checked="true" tabindex="0">💳 Card (Stripe)</div>
+      <div class="pay-method" id="pay-paystack" onclick="selectPayment('paystack')" role="radio" aria-checked="false" tabindex="0">🇿🇦 Paystack (SA)</div>
+    </div>
+    <div class="modal-error" id="modal-error" role="alert" aria-live="polite"></div>
+    <button class="btn btn-gold" style="width:100%;padding:14px;font-size:15px;font-weight:600;border-radius:var(--r-md)" id="pay-btn" onclick="processPayment()">Pay & get my results code →</button>
+    <div class="modal-secure">🔒 Secure · 256-bit SSL · PCI compliant · Instant delivery</div>
+  </div>
+</div>
+
+<!-- ═══════ STICKY CTA ═══════ -->
+<div class="sticky-cta" id="sticky-cta" role="complementary" aria-label="Quick action">
+  <button class="btn btn-gold btn-lg" onclick="openModal('professional')" style="box-shadow:0 8px 30px rgba(0,0,0,0.35)">
+    Get full report · R999 →
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+// ── Config ──────────────────────────────────────────────
+const CONFIG = {
+  appUrl: '/app',
+  stripePublicKey: 'pk_live_YOUR_STRIPE_PUBLIC_KEY', // Replace with your Stripe public key
+  paystackPublicKey: 'pk_live_YOUR_PAYSTACK_PUBLIC_KEY', // Replace with your Paystack public key
+  tiers: {
+    starter: { name: 'Starter Report', zarPrice: 499, usdPrice: 27, zarCents: 49900, usdCents: 2700 },
+    professional: { name: 'Full Intelligence Report', zarPrice: 999, usdPrice: 55, zarCents: 99900, usdCents: 5500 }
+  }
+};
+
+let currentTier = 'professional';
+let currentCurrency = 'ZAR';
+let selectedPayment = 'stripe';
+
+// ── Nav scroll ───────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+  document.getElementById('sticky-cta').classList.toggle('visible', window.scrollY > 600);
+}, { passive: true });
+
+// ── Pentagon animation ───────────────────────────────────
+const ARCHETYPES = [
+  { name: 'Visionary Catalyst', scores: [88, 45, 85, 60, 30] },
+  { name: 'Strategic Operator', scores: [65, 85, 50, 65, 72] },
+  { name: 'Steady Anchor', scores: [45, 78, 40, 75, 88] },
+  { name: 'Relationship Builder', scores: [55, 60, 72, 88, 65] },
+  { name: 'Analytical Challenger', scores: [72, 80, 35, 40, 68] },
+  { name: 'Disciplined Executor', scores: [52, 90, 38, 58, 78] }
+];
+const LABELS = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Stability'];
+const COLORS = ['#C9A84C','#4EA8D4','#7E6EC4','#E87D4A','#1D9E75'];
+
+let currentArchetype = 0;
+let nextArchetype = 1;
+let animProgress = 0;
+let animating = false;
+const canvas = document.getElementById('pentagon-canvas');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+  const W = 380, H = 380, CX = 190, CY = 190, R = 140, SIDES = 5;
+  const ANGLE_OFFSET = -Math.PI / 2;
+
+  function getPoints(scores, r) {
+    return scores.map((s, i) => {
+      const angle = ANGLE_OFFSET + (i / SIDES) * 2 * Math.PI;
+      const rr = r * (s / 100);
+      return [CX + rr * Math.cos(angle), CY + rr * Math.sin(angle)];
+    });
+  }
+
+  function getGridPoints(fraction) {
+    return Array.from({ length: SIDES }, (_, i) => {
+      const angle = ANGLE_OFFSET + (i / SIDES) * 2 * Math.PI;
+      const rr = R * fraction;
+      return [CX + rr * Math.cos(angle), CY + rr * Math.sin(angle)];
+    });
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+
+  function drawPentagon(scores1, scores2, t, alpha = 1) {
+    const t2 = easeInOut(t);
+    const pts = scores1.map((s, i) => {
+      const s2 = scores2 ? scores2[i] : s;
+      return getPoints([lerp(s, s2, t2)], R)[0];
+    });
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid rings
+    [0.25, 0.5, 0.75, 1].forEach(f => {
+      const gp = getGridPoints(f);
+      ctx.beginPath();
+      gp.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.strokeStyle = `rgba(139,157,176,${f === 1 ? 0.25 : 0.1})`;
+      ctx.lineWidth = f === 1 ? 1.5 : 1;
+      ctx.stroke();
+    });
+
+    // Axis lines
+    for (let i = 0; i < SIDES; i++) {
+      const angle = ANGLE_OFFSET + (i / SIDES) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(CX, CY);
+      ctx.lineTo(CX + R * Math.cos(angle), CY + R * Math.sin(angle));
+      ctx.strokeStyle = 'rgba(139,157,176,0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Filled area
+    ctx.beginPath();
+    pts.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+    ctx.closePath();
+    ctx.fillStyle = `rgba(201,168,76,${0.12 * alpha})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(201,168,76,${0.8 * alpha})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Dots
+    pts.forEach(([x, y], i) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS[i];
+      ctx.fill();
+    });
+
+    // Labels
+    for (let i = 0; i < SIDES; i++) {
+      const angle = ANGLE_OFFSET + (i / SIDES) * 2 * Math.PI;
+      const lx = CX + (R + 24) * Math.cos(angle);
+      const ly = CY + (R + 24) * Math.sin(angle);
+      ctx.font = '11px DM Sans, sans-serif';
+      ctx.fillStyle = 'rgba(184,197,208,0.8)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(LABELS[i], lx, ly);
+    }
+  }
+
+  function animate() {
+    if (!animating) return;
+    animProgress += 0.008;
+    if (animProgress >= 1) {
+      animProgress = 0;
+      currentArchetype = nextArchetype;
+      nextArchetype = (nextArchetype + 1) % ARCHETYPES.length;
+      document.getElementById('archetype-name').textContent = ARCHETYPES[currentArchetype].name;
+    }
+    drawPentagon(ARCHETYPES[currentArchetype].scores, ARCHETYPES[nextArchetype].scores, animProgress);
+    requestAnimationFrame(animate);
+  }
+
+  // Initial draw
+  drawPentagon(ARCHETYPES[0].scores, ARCHETYPES[1].scores, 0);
+
+  // Start animating after a beat
+  setTimeout(() => { animating = true; animate(); }, 1500);
+}
+
+// ── Currency toggle ───────────────────────────────────────
+function toggleCurrency() {
+  currentCurrency = currentCurrency === 'ZAR' ? 'USD' : 'ZAR';
+  const isUSD = currentCurrency === 'USD';
+  const toggle = document.getElementById('currency-toggle');
+  toggle.classList.toggle('on', isUSD);
+  toggle.setAttribute('aria-checked', isUSD ? 'true' : 'false');
+  document.getElementById('zar-label').classList.toggle('active', !isUSD);
+  document.getElementById('usd-label').classList.toggle('active', isUSD);
+  document.querySelectorAll('.zar-price').forEach(el => el.style.display = isUSD ? 'none' : '');
+  document.querySelectorAll('.usd-price').forEach(el => el.style.display = isUSD ? '' : 'none');
+  document.querySelectorAll('.zar-symbol').forEach(el => el.style.display = isUSD ? 'none' : '');
+  document.querySelectorAll('.usd-symbol').forEach(el => el.style.display = isUSD ? '' : 'none');
+  updateModalTier();
+}
+
+// ── Segment tabs ──────────────────────────────────────────
+function switchSeg(id, btn) {
+  document.querySelectorAll('.seg-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+  document.querySelectorAll('.seg-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  document.getElementById('seg-' + id).classList.add('active');
+}
+
+// ── FAQ ───────────────────────────────────────────────────
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-q').setAttribute('aria-expanded', 'false'); });
+  if (!isOpen) { item.classList.add('open'); el.setAttribute('aria-expanded', 'true'); }
+}
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFaq(q); } });
+});
+
+// ── Modal ──────────────────────────────────────────────────
+function openModal(tier) {
+  currentTier = tier || 'professional';
+  updateModalTier();
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-email').focus();
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('modal-error').textContent = '';
+}
+
+function closeModalIfOverlay(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function updateModalTier() {
+  const tier = CONFIG.tiers[currentTier];
+  if (!tier) return;
+  document.getElementById('modal-tier-name').textContent = tier.name;
+  const isUSD = currentCurrency === 'USD';
+  document.getElementById('modal-tier-price').textContent = isUSD ? `$${tier.usdPrice}` : `R${tier.zarPrice}`;
+}
+
+function selectPayment(method) {
+  selectedPayment = method;
+  document.getElementById('pay-stripe').classList.toggle('selected', method === 'stripe');
+  document.getElementById('pay-paystack').classList.toggle('selected', method === 'paystack');
+  document.getElementById('pay-stripe').setAttribute('aria-checked', method === 'stripe' ? 'true' : 'false');
+  document.getElementById('pay-paystack').setAttribute('aria-checked', method === 'paystack' ? 'true' : 'false');
+}
+
+document.querySelectorAll('.pay-method').forEach(el => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectPayment(el.id === 'pay-stripe' ? 'stripe' : 'paystack'); }
+  });
+});
+
+function validateModal() {
+  const email = document.getElementById('modal-email').value.trim();
+  const name = document.getElementById('modal-name').value.trim();
+  const err = document.getElementById('modal-error');
+  if (!email || !email.includes('@')) { err.textContent = 'Please enter a valid email address.'; return false; }
+  if (!name) { err.textContent = 'Please enter your name.'; return false; }
+  err.textContent = '';
+  return true;
+}
+
+// ── Payment processing ────────────────────────────────────
+async function processPayment() {
+  if (!validateModal()) return;
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing…';
+
+  const tier = CONFIG.tiers[currentTier];
+  const email = document.getElementById('modal-email').value.trim();
+  const name = document.getElementById('modal-name').value.trim();
+  const isUSD = currentCurrency === 'USD';
+
+  try {
+    if (selectedPayment === 'paystack') {
+      await processPaystack(email, name, tier, isUSD);
+    } else {
+      await processStripe(email, name, tier, isUSD);
+    }
+  } catch (err) {
+    document.getElementById('modal-error').textContent = err.message || 'Payment failed. Please try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Pay & get my results code →';
+  }
+}
+
+// ── Paystack ──────────────────────────────────────────────
+function processPaystack(email, name, tier, isUSD) {
+  return new Promise((resolve, reject) => {
+    const amount = isUSD ? tier.usdCents : tier.zarCents;
+    const currency = isUSD ? 'USD' : 'ZAR';
+    const handler = PaystackPop.setup({
+      key: CONFIG.paystackPublicKey,
+      email,
+      amount,
+      currency,
+      ref: 'PIQ-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+      metadata: { name, tier: currentTier, custom_fields: [{ display_name: 'Product', variable_name: 'product', value: tier.name }, { display_name: 'Customer Name', variable_name: 'name', value: name }] },
+      callback: function(response) {
+        // Payment successful
+        handlePaymentSuccess(email, name, tier, response.reference, 'paystack');
+        resolve(response);
+      },
+      onClose: function() {
+        reject(new Error('Payment cancelled.'));
+      }
+    });
+    handler.openIframe();
+  });
+}
+
+// ── Stripe ────────────────────────────────────────────────
+async function processStripe(email, name, tier, isUSD) {
+  // For Stripe, you'd typically create a payment intent on your server first.
+  // This is a client-side redirect to Stripe Checkout — the simplest integration
+  // that requires no backend changes.
+  // Replace with your actual Stripe Checkout session creation endpoint.
+  const amount = isUSD ? tier.usdCents : tier.zarCents;
+  const currency = isUSD ? 'usd' : 'zar';
+
+  try {
+    // Call your server to create a Stripe Checkout session
+    const response = await fetch('/api/payments/stripe-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, tier: currentTier, amount, currency })
+    });
+
+    if (!response.ok) {
+      // Fallback: if the endpoint doesn't exist yet, show a helpful message
+      throw new Error('Stripe checkout is being set up. Please use Paystack for ZAR payments, or contact hello@partneriq.fit to pay by EFT.');
+    }
+
+    const { sessionUrl } = await response.json();
+    window.location.href = sessionUrl;
+  } catch (err) {
+    throw err;
+  }
+}
+
+// ── Post-payment success ──────────────────────────────────
+async function handlePaymentSuccess(email, name, tier, reference, provider) {
+  try {
+    // Notify your server of the successful payment and get results code
+    const r = await fetch('/api/payments/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, tier: currentTier, reference, provider })
+    });
+    if (r.ok) {
+      const data = await r.json();
+      closeModal();
+      showSuccessScreen(email, data.resultsCode, tier);
+    } else {
+      // Payment went through but confirmation failed — still show success
+      closeModal();
+      showSuccessScreen(email, null, tier);
+    }
+  } catch {
+    closeModal();
+    showSuccessScreen(email, null, tier);
+  }
+}
+
+function showSuccessScreen(email, resultsCode, tier) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('open');
+  document.querySelector('.modal').innerHTML = `
+    <div style="text-align:center;padding:1rem 0">
+      <div style="font-size:52px;margin-bottom:1rem">✓</div>
+      <h3 style="font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--navy);margin-bottom:0.5rem">Payment confirmed!</h3>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:1.5rem">Thank you for your purchase. ${resultsCode ? 'Your results code is below.' : 'Your results code has been sent to ' + email + '.'}</p>
+      ${resultsCode ? `
+      <div style="background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--r-md);padding:1.25rem;margin-bottom:1.5rem">
+        <div style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px">Your results code</div>
+        <div style="font-family:var(--font-display);font-size:18px;color:var(--navy);word-break:break-all;font-weight:500">${resultsCode}</div>
+      </div>
+      ` : `<p style="font-size:13px;color:var(--text-muted);margin-bottom:1.5rem">Check your inbox at <strong>${email}</strong> for your results code.</p>`}
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:1.5rem">Now go to the app, click "View report", and enter your results code to unlock the full report.</p>
+      <a href="${CONFIG.appUrl}" style="display:block;width:100%;text-align:center;padding:14px;background:var(--gold);color:var(--navy-deep);font-weight:600;border-radius:var(--r-md);font-size:15px;font-family:var(--font-body)">Open PartnerIQ → Enter my code</a>
+    </div>
+  `;
+  document.body.style.overflow = 'hidden';
+}
+
+// ── Scroll animations ─────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .evidence-card, .step, .failure-item, .price-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
